@@ -29,14 +29,14 @@ int main()
 	int **list;          
 	list = new int *[n];
 	
-	int **weight;                  //¬ö¿ıÅv­«(distance) 
+	int **weight;                  //ç´€éŒ„æ¬Šé‡(distance) 
     weight = new int *[n];
     
-    int *degrees = new int[n];    // ¬ö¿ı¨C¤@­ÓÂI¦³¦h¤ÖÃä 
+    int *degrees = new int[n];    // ç´€éŒ„æ¯ä¸€å€‹é»æœ‰å¤šå°‘é‚Š 
     for(int i = 0; i < n; i++)
         degrees[i] = 0;
     
-    int *nodeAccept;              //¬ö¿ı½d³ò¤ºªºnode 
+    int *nodeAccept;              //ç´€éŒ„ç¯„åœå…§çš„node 
     nodeAccept = new int[n];
     for(int i = 0; i < n; i++)
 		nodeAccept[i] = -1;
@@ -52,7 +52,7 @@ int main()
 	
     getline(cin, px, ',');
     int x = atoi(px.c_str());
-    x--;                                  //¥ş³¡ÂIªº½s¸¹³£´î¤@(´ú¸ê1~5 = ³o¸Ì0~4) 
+    x--;                                  //å…¨éƒ¨é»çš„ç·¨è™Ÿéƒ½æ¸›ä¸€(æ¸¬è³‡1~5 = é€™è£¡0~4) 
     nodeAccept[0] = x;
 	getline(cin, ps); 
     int s = atoi(ps.c_str());
@@ -73,7 +73,7 @@ int main()
 	  cout << nodeAccept[i] << " " ;
 	cout << "\n";
 */
-// ²M±¼²Ä¤@­Ó¼Æ(x¦Û¤v)		
+// æ¸…æ‰ç¬¬ä¸€å€‹æ•¸(xè‡ªå·±)		
 //-----------------------------------	
 	for(int i = 0; i < n -1; i++)
 	{
@@ -148,20 +148,20 @@ int main()
 }
   
 
-void inputGraphInfo(int m, int **edgeInfo, int *degrees)   //­n¶Çpointer¶i¥h, call by pointer 
+void inputGraphInfo(int m, int **edgeInfo, int *degrees)   //è¦å‚³pointeré€²å», call by pointer 
 {
 	for(int i = 0; i < m; i++)// input data and calculate the degrees
 	{   
-    	string pu, pv, pdist;   // ¤@±øÃäªººİÂI¡B¥t¤@­ÓºİÂI
+    	string pu, pv, pdist;   // ä¸€æ¢é‚Šçš„ç«¯é»ã€å¦ä¸€å€‹ç«¯é»
     	getline(cin, pu, ',');
     	int u = atoi(pu.c_str());
-    	u--;                                              //½s¸¹´î¤@ 
+    	u--;                                              //ç·¨è™Ÿæ¸›ä¸€ 
     	edgeInfo[i][0] = u;
     	degrees[u]++;
     	  	
 	    getline(cin, pv, ',');
 	    int v = atoi(pv.c_str());
-	    v--;                                              // ½s¸¹´î¤@ 
+	    v--;                                              // ç·¨è™Ÿæ¸›ä¸€ 
 	    edgeInfo[i][1] = v;
 	    degrees[v]++;
 	    
@@ -174,7 +174,7 @@ void inputGraphInfo(int m, int **edgeInfo, int *degrees)   //­n¶Çpointer¶i¥h, ca
 
 void adjacency_lists( int n, int m, int **list, int ** weight, int **edgeInfo, int *degrees)
 {  
-	//¬ö¿ılist ¥Ø«eintput¶i´X­Ó­È  
+	//ç´€éŒ„list ç›®å‰intputé€²å¹¾å€‹å€¼  
 	int *size;
 	size = new int[n];    
 	for(int i = 0; i < n; i++)
@@ -215,7 +215,7 @@ void findNextNode(int n, int s, int i, int node, int *degrees, int **list, int *
 		{   
 			pre = node;
 			node = list[node][i];
-			if(!ifAccepted(n, node, nodeAccept))                         // ¦pªG¦¹½d³ò¤º¸`ÂIÁÙ¨S¦³³Q¬ö¿ı¹L¡A¥[¶inodeAccept 
+			if(!ifAccepted(n, node, nodeAccept))                         // å¦‚æœæ­¤ç¯„åœå…§ç¯€é»é‚„æ²’æœ‰è¢«ç´€éŒ„éï¼ŒåŠ é€²nodeAccept 
 			{	
 	//			cout << node << "add into nodeAccept" << "\n";
 	//			cout << " pre = " << pre << ", i = " << i << "weight[pre][i] = " << weight[pre][i] << "\n";
