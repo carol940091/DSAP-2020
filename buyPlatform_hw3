@@ -1,0 +1,386 @@
+#include <iostream>
+#include <string>
+#include <cstring>
+using namespace std;
+
+//這邊要改成動態陣列
+//開始考慮第二題 
+
+ 
+struct ManuScore
+{
+	string name = " ";
+	int score = 0;	
+};
+
+struct Product
+{
+	string name = " ";
+	ManuScore *whoSell[300];
+	int whoSellCnt = 0;
+};
+
+class Customer
+{
+private:
+
+public:
+    Customer();
+	Customer(string n);
+	void addTrade(Product *purchased[300], string manufacturer, string product,  int manuScore, int &productCnt);	
+	bool ifVip();	
+	Product *purchased[300];
+	string traded[300];
+	int productCnt = 0;
+	int tradedCnt  = 0;
+	string name = " "; 
+	double times = 0;
+	double totalScore = 0;
+	
+};
+Customer::Customer()
+{
+	name = "0";
+	productCnt = 0; 
+}
+
+Customer::Customer(string n)
+{
+	name = n;
+	productCnt = 0;
+}
+bool Customer::ifVip()
+{
+	if(times >= 3 && (totalScore / times) > 3)
+		return true;
+}
+class Manufacturer
+{
+private:
+
+public:
+    Manufacturer();
+	Manufacturer(string n);
+	void addTrade(int manuScore);
+	int searchProduct(string name);		
+	string product[300];
+	int productCnt = 0;
+	string name = " "; 
+	double times = 0;
+	double totalScore = 0;
+};
+Manufacturer::Manufacturer()
+{
+	name = " ";
+	productCnt = 0; 
+}
+Manufacturer::Manufacturer(string n)
+{
+	name = n;
+	productCnt = 0;
+}
+void Manufacturer::addTrade(int manuScore)
+{
+	times++;
+	totalScore += manuScore;	
+}
+
+int Manufacturer::searchProduct(string name)
+{
+	for(int i = 0; i < productCnt; i++ )
+	{
+		if(product[i] == name)
+			return i;	
+	}
+	return -1;
+}
+
+
+void Customer::addTrade(Product *purchased[300], string manufacturer, string product,  int manuScore, int &productCnt)
+{		
+	int isIn = 0;
+	//如果消費者有買過這項產品，就在既有產品裡新增商家 
+	for(int i = 0; i < productCnt; i++)
+	{    
+		if(purchased[i] -> name == product)
+		{   
+			isIn = 1;
+			purchased[i] -> whoSell[purchased[i] -> whoSellCnt] = new ManuScore;
+			purchased[i] -> whoSell[purchased[i] -> whoSellCnt] -> name  = manufacturer;
+			purchased[i] -> whoSell[purchased[i] -> whoSellCnt] ->score = manuScore;
+			purchased[i] -> whoSellCnt++;
+		}	
+	}
+	//如果消費者以前沒買過這項產品 
+	if(isIn == 0)
+	{   
+		purchased[productCnt] = new Product; 
+		purchased[productCnt] -> name = product;
+		purchased[productCnt] -> whoSell[purchased[productCnt] -> whoSellCnt] = new ManuScore;
+		purchased[productCnt] -> whoSell[purchased[productCnt] -> whoSellCnt] -> name  = manufacturer;
+		purchased[productCnt] -> whoSell[purchased[productCnt] -> whoSellCnt] -> score = manuScore;
+		purchased[productCnt] -> whoSellCnt++;
+		productCnt++;		
+	}
+	isIn = 0;
+	for(int i = 0; i < tradedCnt; i++)
+	{
+		if(traded[i] == manufacturer)
+			isIn = 1;
+	}
+	if(isIn == 0)
+	{
+		traded[tradedCnt] = manufacturer;
+		tradedCnt ++;
+	}
+
+}
+
+int search(string customer,    int Cnt, Customer     *cMember[300]);
+int search(string customer,    int Cnt, Manufacturer *cMember[300]);
+int searchProduct(string name, int cnt, Customer     *cMember[300]);
+
+//main function******************************************/////////////////////////////////////////////////////////////
+
+int main()
+{ 	
+	Customer     *cMember[300];
+	Manufacturer *mMember[300]; 
+    int cMemberCnt = 0;
+    int mMemberCnt = 0;
+    char a = ' ';
+    
+	while(cin >> a)
+	{   
+		if( a == 'C')
+		{
+			string name;
+			cin >> name;
+			if(cMemberCnt == 0 || search(name, cMemberCnt, cMember) == -1)
+			{
+				cMember[cMemberCnt] = new Customer(name);  // add object into cMember
+				cMemberCnt++;			
+			}
+		}
+		else 
+			if(a == 'T')
+				{
+					string customer , manufacturer, product;
+					int    manuScore = 0, customerScore = 0;
+					cin >> customer >> manufacturer >> product >> manuScore >> customerScore;
+					
+                    int i = search(customer, cMemberCnt, cMember);
+					cMember[i] -> addTrade(cMember[i] -> purchased, manufacturer, product, manuScore, cMember[i] -> productCnt);
+					(cMember[i] -> times)++;
+					(cMember[i] -> totalScore) += customerScore;
+					
+					int j = search(manufacturer, mMemberCnt, mMember);
+					mMember[j] -> addTrade(manuScore);					
+					
+				}
+				else
+					if(a == 'S')
+					{    
+						string customer, product;
+						cin >> customer >> product;
+						int customerPtr = search(customer, cMemberCnt, cMember);
+						int productPtr  = searchProduct(product, customerPtr, cMember);
+						string outcome[300];
+						int outcomeCnt = 0;						
+						int scoreN = 0, X = 0;
+						char k = cin.get();
+						//如果是第二種搜尋功能就把後面兩個數字cin 
+
+						if(k == ' ')
+						{
+							cin >> scoreN >> X;
+							int i = search(customer, cMemberCnt, cMember);
+							//不是VIP的客戶拒絕搜尋 
+							if(cMember[i] -> ifVip() == false )
+								cout << "reject";
+							else
+							{
+								if(X == 0)
+								{	// 如果消費者搜尋沒買過的商品就印出空行 
+									if(productPtr == -1)  
+							    		cout << "";
+							    	else
+							    	{
+										//找出最高的評分 
+										double max = 0;
+										for(int i = 0; i < cMember[customerPtr] -> purchased[productPtr] -> whoSellCnt; i++)
+										{	
+											string manu = cMember[customerPtr] -> purchased[productPtr] -> whoSell[i] -> name;
+											int manuCnt = search(manu,  mMemberCnt, mMember);
+											if(mMember[manuCnt] -> times >= scoreN)
+												if(cMember[customerPtr] -> purchased[productPtr] -> whoSell[i] -> score >= max)
+													max = cMember[customerPtr] -> purchased[productPtr] -> whoSell[i] -> score;	
+										}
+							 			//把同樣都是最高分的廠商都放進 outcome
+								 		for(int i = 0; i < cMember[customerPtr] -> purchased[productPtr] -> whoSellCnt; i++)
+								 		{   
+								 		    string manu = cMember[customerPtr] -> purchased[productPtr] -> whoSell[i] -> name;
+											int manuCnt = search(manu,  mMemberCnt, mMember);
+											if(mMember[manuCnt] -> times >= scoreN)
+								 		    	if(cMember[customerPtr] -> purchased[productPtr] -> whoSell[i] -> score == max)
+									 			{
+													outcome[outcomeCnt] = cMember[customerPtr] -> purchased[productPtr] -> whoSell[i] -> name;
+												    outcomeCnt++;
+						    					}	 
+										}
+									}
+								}
+								else
+								{
+									double max = 0;
+									for(int i = 0; i < mMemberCnt; i++)
+									{
+										if(mMember[i] -> searchProduct(product) != -1 && mMember[i] -> times >= scoreN )
+										{
+											if( (mMember[i] -> totalScore) / (mMember[i] -> times) > max )
+												max = (mMember[i] -> totalScore) / (mMember[i] -> times);
+										}
+									}
+
+							 		//把同樣都是最高分的廠商都放進 outcome
+							 		for(int i = 0; i < mMemberCnt; i++)
+							 		{   
+ 										if(mMember[i] -> searchProduct(product) != -1 && mMember[i] -> times >= scoreN )
+										{
+											if( (mMember[i] -> totalScore) / (mMember[i] -> times) == max )
+											{
+												outcome[outcomeCnt] = mMember[i] -> name;
+												outcomeCnt++;	
+											} 
+										}		
+						    		}	 		
+								}
+							}
+						}
+						else
+						{	
+							// 如果消費者搜尋沒買過的商品就印出空行 
+							if(productPtr == -1)  
+							    cout << "";
+							else
+							{
+								//找出最高的評分 
+								double max = 0;
+								for(int i = 0; i < cMember[customerPtr] -> purchased[productPtr] -> whoSellCnt; i++)
+								{	
+									if(cMember[customerPtr] -> purchased[productPtr] -> whoSell[i] -> score >= max)
+										max = cMember[customerPtr] -> purchased[productPtr] -> whoSell[i] -> score;	
+								}
+								//string outcome[300];
+								//int outcomeCnt = 0;
+
+						 		//把同樣都是最高分的廠商都放進 outcome
+						 		for(int i = 0; i < cMember[customerPtr] -> purchased[productPtr] -> whoSellCnt; i++)
+						 		{
+						 		    if(cMember[customerPtr] -> purchased[productPtr] -> whoSell[i] -> score == max)
+						 			{
+										outcome[outcomeCnt] = cMember[customerPtr] -> purchased[productPtr] -> whoSell[i] -> name;
+									    outcomeCnt++;
+						    		}	 
+								}
+									
+				    		}	
+				    	} 
+				    	if(outcomeCnt == 0)
+				    		cout << "";
+				    	else
+				    		if(productPtr != -1 || X == 1)
+				    	{
+							string *output = new string[outcomeCnt];
+							for(int i = 0; i < outcomeCnt; i++)
+								output[i] = outcome[i];
+					
+								//用 Compare 排序  
+							if(outcomeCnt >= 2)
+   							for (int i = 1; i < outcomeCnt; i++) 
+  							{   					
+           						string key = output[i];
+           						int j = i - 1;
+ 		           				while (j >= 0 && key.compare(output[j]) < 0)
+        	   				 	{   
+            	    				output[j+1] = output[j];
+                					j--;
+           	 					}
+            					output[j+1] = key;	
+    						} 
+					  		//print  
+							for(int i = 0; i < outcomeCnt; i++)
+							{   
+								if(i == outcomeCnt - 1 || i == 4)
+								{
+									cout << output[i];
+									break;
+								}
+								else 
+									cout << output[i] << ' '; 
+							}
+	
+						}
+					cout << "\n";
+					}
+					//新增廠商 -----------------------------
+					else
+						if(a == 'M')
+						{
+							string name;
+			                cin >> name;
+							if(mMemberCnt == 0 || search(name, mMemberCnt, mMember) == -1)
+							{
+								mMember[mMemberCnt] = new Manufacturer(name);  // add object into mMember
+								mMemberCnt++;			
+							}
+						}
+						else
+							if(a == 'P')
+							{
+								string P1;
+								cin >> P1;
+							}
+							else
+							//新增某廠商的商品 -----------------------------(此廠商一定沒有新增過此商品)
+								if(a == 'A')
+								{
+									string manufacturer,   product;
+									cin >> manufacturer >> product;
+									int i = search(manufacturer, mMemberCnt, mMember);
+									mMember[i] -> product[mMember[i] -> productCnt] = product;
+									(mMember[i] -> productCnt)++;  			
+								}
+	
+	}	
+	
+	return 0;	
+}
+
+int search(string name, int Cnt, Customer *cMember[300])
+{
+	for(int i = 0; i < Cnt; i++)	
+	{
+		if(cMember[i] -> name == name)
+			return i;
+	}
+	return -1;
+}
+int search(string name, int Cnt, Manufacturer *cMember[300])
+{
+	for(int i = 0; i < Cnt; i++)	
+	{
+		if(cMember[i] -> name == name)
+			return i;
+	}
+	return -1;
+}
+int searchProduct(string name, int cnt, Customer *cMember[300])
+{
+	for(int i = 0; i < (cMember[cnt] -> productCnt) ; i++ )
+	{
+		if(cMember[cnt] -> purchased[i] -> name == name)
+			return i;	
+	}
+	return -1;
+}
